@@ -204,9 +204,14 @@ public class DetailedUserInformation extends AppCompatActivity {
                     public void run() {
                         TextView FullView=(TextView)findViewById(R.id.info_full);
                         FullView.setText(info_full);
-                        imView = (ImageView) findViewById(R.id.avatar);
-                        imView.setImageBitmap(bitmap);
+                        if (avatar_path.equals(null)){
+                            Toast.makeText(DetailedUserInformation.this, "No Avatar", Toast.LENGTH_LONG).show();
 
+                        }
+                        else {
+                            imView = (ImageView) findViewById(R.id.avatar);
+                            imView.setImageBitmap(bitmap);
+                        }
 
                     }
                 });
