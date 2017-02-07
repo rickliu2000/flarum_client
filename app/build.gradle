@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "io.nfls.login"
+        applicationId "io.nfls.forum"
         minSdkVersion 21
         targetSdkVersion 24
         versionCode 1
@@ -25,4 +25,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.squareup.okhttp:okhttp:2.7.5'
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
+    compile 'com.android.support:design:25.1.1'
 }

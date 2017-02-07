@@ -26,4 +26,10 @@
         android:id="@+id/avatar"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.26" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/forum" />
+
 </LinearLayout>

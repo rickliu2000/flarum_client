@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -58,6 +59,7 @@ public class forum_main extends AppCompatActivity
     URL myFileUrl = null;
     Bitmap bitmap = null;
     ImageView imView;
+    private long exitTime = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,9 +84,15 @@ public class forum_main extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
-        if(!isLogedin.equals("true")){
-            startActivity(new Intent(forum_main.this,MainActivity.class));
-        }else{
+        imView = (ImageView) header.findViewById(R.id.avatar_bar);
+        imView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(forum_main.this,MainActivity.class));
+
+            }
+        });
+        if(isLogedin.equals("true")){
            username=read.getString("Username", "");
            email=read.getString("Email", "");
            avatar_path=read.getString("Avatar_addr", "");
@@ -115,7 +123,8 @@ public class forum_main extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+            exit();
         }
     }
 
@@ -127,8 +136,6 @@ public class forum_main extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == R.id.avatar_bar) {
-            Toast.makeText(forum_main.this, "login", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -145,6 +152,20 @@ public class forum_main extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
+    public void exit() {
+        if ((System.currentTimeMillis() - exitTime) > 200) {
+            Toast.makeText(getApplicationContext(), "连按两次退出程序",
+                    Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            finish();
+            //System.exit(0);
+        }
+    }
+
 
     private void showAvatar(){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

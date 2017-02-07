@@ -50,7 +50,6 @@ public class DetailedUserInformation extends AppCompatActivity {
     String id="";
     String info_full="";
     String imageUrl ="";
-    private long exitTime = 0;
     ImageView imView;
     URL myFileUrl = null;
     Bitmap bitmap = null;
@@ -67,25 +66,6 @@ public class DetailedUserInformation extends AppCompatActivity {
 
     }*/
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            exit();
-            return false;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    public void exit() {
-        if ((System.currentTimeMillis() - exitTime) > 200) {
-            Toast.makeText(getApplicationContext(), "连按两次退出程序",
-                    Toast.LENGTH_SHORT).show();
-            exitTime = System.currentTimeMillis();
-        } else {
-            //finish();
-            System.exit(0);
-        }
-    }
 
     private void initView(){
         SharedPreferences read = getSharedPreferences("lock",MODE_PRIVATE);
@@ -227,8 +207,6 @@ public class DetailedUserInformation extends AppCompatActivity {
                         else {
                             imView = (ImageView) findViewById(R.id.avatar);
                             imView.setImageBitmap(bitmap);
-                            imView = (ImageView) barView.findViewById(R.id.avatar_bar);
-                            imView.setImageBitmap(bitmap);
                         }
                         SharedPreferences.Editor editor = getSharedPreferences("lock", MODE_PRIVATE).edit();
                         editor.putString("isLogin", "true");
@@ -238,7 +216,7 @@ public class DetailedUserInformation extends AppCompatActivity {
                         editor.commit();
                         System.out.println("true");
 
-                        startOtherActivity();
+                        //startOtherActivity();
 
                     }
                 });
