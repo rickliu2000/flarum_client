@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class UserLogin extends AppCompatActivity {
     private LoginIO mTask;
     private TokenCHK CHKTask;
     private TextView textView;
@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     String twoHyphens = "--";
     String boundary =  "WebKitFormBoundary7MA4YWxkTrZu0gW";
     String json="";
+    String isLogedin="";
     //private List<NameValuePair> data = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         tokenExisted = read.getString("token", "");
         System.out.println(tokenExisted);
         if (!tokenExisted.equals("")){
-            new AlertDialog.Builder(MainActivity.this)
+            new AlertDialog.Builder(UserLogin.this)
                     .setTitle("Login")
                     .setMessage("呦～等一会吧")
                     .show();
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void login(String username, String password) {
-        //Toast.makeText(MainActivity.this, username + password, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(UserLogin.this, username + password, Toast.LENGTH_SHORT).show();
         /*
         try {
             // 首先最外层是{}，是创建一个对象
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void startOtherActivity()
     {
-        startActivity(new Intent(MainActivity.this,DetailedUserInformation.class));
+        startActivity(new Intent(UserLogin.this,DetailedUserInformation.class));
        finish();
 
     }
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 //.getJSONObject("");
                 System.out.println(jsonObject);
             } catch (JSONException ex) {
-                //Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                 System.out.println("Server Error");
             }
 
@@ -167,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 status=jsonObject
                         .getString("status");
             }catch (JSONException ex) {
-                //Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                 System.out.println("JSON fucked");
 
             }
@@ -186,11 +187,11 @@ public class MainActivity extends AppCompatActivity {
                     //System.out.println("FUCKING JSON");
                     success=true;
                 } catch (JSONException ex) {
-                    //Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                     System.out.println("JSON fucked");
 
                 }
-                //Toast.makeText(MainActivity.this, token + id, Toast.LENGTH_LONG).show();
+                //Toast.makeText(UserLogin.this, token + id, Toast.LENGTH_LONG).show();
                 //System.out.println(token+"--"+id);
 
 
@@ -208,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                     //System.out.println("FUCKING JSON");
                     //success=true;
                 } catch (JSONException ex) {
-                    //Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                     System.out.println("JSON fucked");
 
                 }
@@ -223,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                 url = new URL(urlPath);
             } catch (MalformedURLException ex) {
                 //System.out.println("666");
-              // Toast.makeText(MainActivity.this, "666", Toast.LENGTH_SHORT).show();
+              // Toast.makeText(UserLogin.this, "666", Toast.LENGTH_SHORT).show();
             }
             //System.out.println("fuck");
             HttpURLConnection conn = null;
@@ -237,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                 conn.setDoOutput(true);
                 conn.setRequestMethod("POST");
             } catch (ProtocolException ex) {
-               // Toast.makeText(MainActivity.this, "ProtocolException", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(UserLogin.this, "ProtocolException", Toast.LENGTH_SHORT).show();
                 System.out.println("bad protocol");
             }
             //conn.setRequestProperty("ser-Agent", "Fiddler");
@@ -279,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             } catch (IOException ex) {
-                //Toast.makeText(MainActivity.this, "IO Error", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(UserLogin.this, "IO Error", Toast.LENGTH_SHORT).show();
                 //System.out.println("IO fucked");
             }*/
 
@@ -293,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                        editor.commit();
                        startOtherActivity();
                    }else if (status.equals("error")){
-                       Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                       Toast.makeText(UserLogin.this, message, Toast.LENGTH_SHORT).show();
                    }
                 }
             });
@@ -336,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
                 status=jsonObject
                         .getString("username");
             }catch (JSONException ex) {
-                //Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                 System.out.println("JSON fucked");
 
             }
@@ -366,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
 
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(MainActivity.this, "Welcome back "+ status, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserLogin.this, "Welcome back "+ status, Toast.LENGTH_SHORT).show();
                         startOtherActivity();
                     }
                 });

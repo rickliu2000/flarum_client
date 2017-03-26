@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,19 +19,20 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,7 +42,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Rickliu on 2/6/17.
@@ -50,6 +50,23 @@ import java.util.List;
 public class forum_main extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
     private GetDetail GetDetailTask;
+    private GetDiscussion GetDiscussionTask;
+    String json="";
+    String status="";
+    String attributes="";
+    String type="";
+    String title="";
+    String commentsCount="";
+    String startTime="";
+    String startUser="";
+    String relationships="";
+    String lastUser="";
+    String startUserid="";
+    String lastUserid="";
+    String UserData="";
+    String tags="";
+    String id="";
+    final ArrayList<String> list = new ArrayList<String>();
     Context context=this;
     String isLogedin="";
     String username="";
@@ -60,6 +77,7 @@ public class forum_main extends AppCompatActivity
     Bitmap bitmap = null;
     ImageView imView;
     private long exitTime = 0;
+    int[] discussionID=new int[20];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,7 +106,12 @@ public class forum_main extends AppCompatActivity
         imView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(forum_main.this,MainActivity.class));
+                if(isLogedin.equals("true")) {
+
+                    startActivity(new Intent(forum_main.this, DetailedUserInformation.class));
+                } else{
+                    startActivity(new Intent(forum_main.this, UserLogin.class));
+                }
 
             }
         });
@@ -104,6 +127,8 @@ public class forum_main extends AppCompatActivity
            Email.setText(email);
            GetDetailTask= new GetDetail();
            GetDetailTask.execute();
+           GetDiscussionTask= new GetDiscussion();
+           GetDiscussionTask.execute();
 
        }
 
@@ -163,8 +188,30 @@ public class forum_main extends AppCompatActivity
         } else {
             finish();
             //System.exit(0);
+
         }
     }
+
+    public void setlist(){
+        final ArrayAdapter adapter = new ArrayAdapter(this,R.layout.discussion_list,list);
+        ListView listView = (ListView) findViewById(R.id.discussion_List);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Object string=adapter.getItem(position);
+                Long sss =adapter.getItemId(position);
+                int numcount=sss.intValue();
+                System.out.println("**********"+ discussionID[numcount]);
+
+
+            }
+        });
+
+    }
+
 
 
     private void showAvatar(){
@@ -177,10 +224,7 @@ public class forum_main extends AppCompatActivity
     private class GetDetail extends AsyncTask<Integer, String, Integer> {
         @Override
         protected Integer doInBackground(Integer... params) {
-
-
                 imageUrl="https://forum.nfls.io/assets/avatars/"+avatar_path;
-
                 try {
                     myFileUrl = new URL(imageUrl);
                 } catch (MalformedURLException e) {
@@ -197,35 +241,97 @@ public class forum_main extends AppCompatActivity
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
-
-
-
             runOnUiThread(new Runnable() {
                 public void run() {
-
                     if (avatar_path.equals(null)){
                         Toast.makeText(forum_main.this, "No Avatar", Toast.LENGTH_LONG).show();
-
                     }
                     else {
                        showAvatar();
-
                     }
+                }
+            });
+            return null;
+        }
+    }
 
 
+    private class GetDiscussion extends AsyncTask<Integer, String, Integer> {
+        @Override
+        protected Integer doInBackground(Integer... params) {
 
+
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpGet httppost = new HttpGet("https://forum.nfls.io/api/discussions");
+
+            try {
+                HttpResponse response = httpclient.execute(httppost);
+                json = EntityUtils.toString(response.getEntity());
+            } catch (ClientProtocolException e) {
+                System.out.println("Protool Error");
+            } catch (IOException e) {
+                System.out.println("IO Error");
+            }
+            //System.out.println(json);
+            System.out.println(2);
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(json);
+                System.out.println(jsonObject);
+            } catch (JSONException ex) {
+                System.out.println("Server Error");
+            }
+            System.out.println(status);
+            try {
+                JSONArray discussionList=jsonObject.getJSONArray("data");
+                int num=discussionList.length();
+                for(int i=0;i<num;i++){
+                    //System.out.println(i);
+                    JSONObject discussion=discussionList.getJSONObject(i);
+                    //System.out.println(i+" "+discussion);
+                    id=discussion.getString("id");
+                    type=discussion.getString("type");
+                    attributes=discussion.getString("attributes");
+                    //System.out.println(attributes);
+                    //------------------start attributes------------------
+                    JSONObject attributes_json=new JSONObject(attributes);
+                    title=attributes_json.getString("title");
+                    commentsCount=attributes_json.getString("commentsCount");
+                    startTime=attributes_json.getString("startTime");
+                    //------------------end of attributes------------------
+                    //username=attributes_json.getString("username");
+                    //------------------start relationships-----------------
+                    relationships=discussion.getString("relationships");
+                    JSONObject relationship_json =new JSONObject(relationships);
+                    //------------------start startUser-----------------
+                    startUser=relationship_json.getString("startUser");
+                    JSONObject startUser_json=new JSONObject(startUser);
+                    UserData=startUser_json.getString("data");
+                    JSONObject UserData_json=new JSONObject(UserData);
+                    startUserid=UserData_json.getString("id");
+                    //------------------start lastUser-----------------
+                    lastUser=relationship_json.getString("lastUser");
+                    JSONObject lastUser_json=new JSONObject(lastUser);
+                    UserData=lastUser_json.getString("data");
+                    UserData_json=new JSONObject(UserData);
+                    lastUserid=UserData_json.getString("id");
+                    //------------------end of relationships------------
+                    System.out.println(i+" "+id+" "+type+" "+title+" author:"+startUserid+" Last reply:"+lastUserid+" post time:"+startTime+" reply:"+commentsCount);
+                    list.add(title+" author:"+startUserid+" Last reply:"+lastUserid+" post time:"+startTime+" reply:"+commentsCount);
+
+                    discussionID[i]=Integer.valueOf(id);
+                }
+
+            }catch (JSONException ex){
+
+            }
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    setlist();
                 }
             });
 
-
-
-
-
             return null;
-
         }
-
     }
 }

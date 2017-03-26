@@ -120,7 +120,7 @@ public class DetailedUserInformation extends AppCompatActivity {
                 status=jsonObject
                         .getString("status");
             }catch (JSONException ex) {
-                //Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                 System.out.println("JSON fucked");
 
             }
@@ -154,11 +154,11 @@ public class DetailedUserInformation extends AppCompatActivity {
                     +"join time:"+join_time+"\n";
 
                 } catch (JSONException ex) {
-                    //Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                     System.out.println("JSON fucked");
 
                 }
-                //Toast.makeText(MainActivity.this, token + id, Toast.LENGTH_LONG).show();
+                //Toast.makeText(UserLogin.this, token + id, Toast.LENGTH_LONG).show();
                 //System.out.println(token+"--"+id);
                 imageUrl="https://forum.nfls.io/assets/avatars/"+avatar_path;
 
