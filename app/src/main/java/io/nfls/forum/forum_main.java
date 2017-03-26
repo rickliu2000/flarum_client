@@ -63,6 +63,8 @@ public class forum_main extends AppCompatActivity
     String lastUser="";
     String startUserid="";
     String lastUserid="";
+    String startUserName="";
+    String lastUserName="";
     String UserData="";
     String tags="";
     String id="";
@@ -78,6 +80,8 @@ public class forum_main extends AppCompatActivity
     ImageView imView;
     private long exitTime = 0;
     int[] discussionID=new int[20];
+    String[] UserID=new String[40];
+    String[] UserName=new String[40];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,7 +209,9 @@ public class forum_main extends AppCompatActivity
                 Long sss =adapter.getItemId(position);
                 int numcount=sss.intValue();
                 System.out.println("**********"+ discussionID[numcount]);
-
+                Intent intent = new Intent(forum_main.this, DiscussionDetail.class);
+                intent.putExtra("DISCUSSION_ID",Integer.toString(discussionID[numcount]));
+                startActivity(intent);
 
             }
         });
@@ -262,7 +268,7 @@ public class forum_main extends AppCompatActivity
 
 
             HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httppost = new HttpGet("https://forum.nfls.io/api/discussions");
+            HttpGet httppost = new HttpGet("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser");
 
             try {
                 HttpResponse response = httpclient.execute(httppost);
@@ -281,10 +287,22 @@ public class forum_main extends AppCompatActivity
             } catch (JSONException ex) {
                 System.out.println("Server Error");
             }
-            System.out.println(status);
+            //System.out.println(status);
             try {
                 JSONArray discussionList=jsonObject.getJSONArray("data");
                 int num=discussionList.length();
+                JSONArray UserList=jsonObject.getJSONArray("included");
+                int Usernum=UserList.length();
+                for (int i=0;i<Usernum;i++){
+                    JSONObject UserInfo=UserList.getJSONObject(i);
+                    String UserId=UserInfo.getString("id");
+                    String name_attributes=UserInfo.getString("attributes");
+                    JSONObject username_json=new JSONObject(name_attributes);
+                    UserName[i]=username_json.getString("username");
+                    UserID[i]=UserId;
+                    //System.out.println(UserName[i]+" "+UserID[i]);
+
+                }
                 for(int i=0;i<num;i++){
                     //System.out.println(i);
                     JSONObject discussion=discussionList.getJSONObject(i);
@@ -316,8 +334,17 @@ public class forum_main extends AppCompatActivity
                     UserData_json=new JSONObject(UserData);
                     lastUserid=UserData_json.getString("id");
                     //------------------end of relationships------------
-                    System.out.println(i+" "+id+" "+type+" "+title+" author:"+startUserid+" Last reply:"+lastUserid+" post time:"+startTime+" reply:"+commentsCount);
-                    list.add(title+" author:"+startUserid+" Last reply:"+lastUserid+" post time:"+startTime+" reply:"+commentsCount);
+                    for (int j=0;j<40;j++){
+                        if(startUserid.equals(UserID[j])){
+                            //System.out.println(j+" "+UserID[j]+" "+UserName[j]);
+                            startUserName=UserName[j];
+                        }
+                        if(lastUserid.equals(UserID[j])){
+                            lastUserName=UserName[j];
+                        }
+                    }
+                    System.out.println(i+" "+id+" "+type+" "+title+" author:"+startUserName+" Last reply:"+lastUserName +" post time:"+startTime+" reply:"+commentsCount);
+                    list.add(title+" author:"+startUserName+" Last reply:"+lastUserName+" post time:"+startTime+" reply:"+commentsCount);
 
                     discussionID[i]=Integer.valueOf(id);
                 }

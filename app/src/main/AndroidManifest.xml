@@ -16,9 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="io.nfls.forum.DetailedUserInformation" >
-    </activity>
+        <activity android:name="io.nfls.forum.DetailedUserInformation" ></activity>
         <activity android:name="io.nfls.forum.UserLogin" ></activity>
+        <activity android:name="io.nfls.forum.DiscussionDetail" ></activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
