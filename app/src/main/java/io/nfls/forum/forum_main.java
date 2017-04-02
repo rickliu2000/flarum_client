@@ -103,6 +103,8 @@ public class forum_main extends AppCompatActivity
         SharedPreferences read = getSharedPreferences("lock",MODE_PRIVATE);
         isLogedin = read.getString("isLogin", "");
         System.out.println(isLogedin);
+        GetDiscussionTask= new GetDiscussion();
+        GetDiscussionTask.execute();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
@@ -131,8 +133,7 @@ public class forum_main extends AppCompatActivity
            Email.setText(email);
            GetDetailTask= new GetDetail();
            GetDetailTask.execute();
-           GetDiscussionTask= new GetDiscussion();
-           GetDiscussionTask.execute();
+
 
        }
 
