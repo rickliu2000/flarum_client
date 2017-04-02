@@ -41,6 +41,7 @@ import java.util.List;
 public class DetailedUserInformation extends AppCompatActivity {
     private GetDetail GetDetailTask;
     String tokenExisted = "";
+    String firstLogin="true";
     String json="";
     String status="";
     String username="";
@@ -70,6 +71,11 @@ public class DetailedUserInformation extends AppCompatActivity {
     private void initView(){
         SharedPreferences read = getSharedPreferences("lock",MODE_PRIVATE);
         tokenExisted = read.getString("token", "");
+        firstLogin = read.getString("firstLogin", "");
+        if(firstLogin.equals("")){
+            firstLogin="true";
+            System.out.println("Will perform a restart");
+        }
         //System.out.println(tokenExisted);
         //TextView TokenView=(TextView)findViewById(R.id.token);
         //TokenView.setText(tokenExisted);
@@ -81,8 +87,12 @@ public class DetailedUserInformation extends AppCompatActivity {
     }
     private void startOtherActivity()
     {
-        startActivity(new Intent(DetailedUserInformation.this,forum_main.class));
+        Intent i = getBaseContext().getPackageManager()
+                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         finish();
+        startActivity(i);
 
     }
 
@@ -200,6 +210,7 @@ public class DetailedUserInformation extends AppCompatActivity {
                         Username.setText(username);
                         TextView Email=(TextView)barView.findViewById(R.id.email_bar);
                         Email.setText(email);
+
                         if (avatar_path.equals(null)){
                             Toast.makeText(DetailedUserInformation.this, "No Avatar", Toast.LENGTH_LONG).show();
 
@@ -213,10 +224,15 @@ public class DetailedUserInformation extends AppCompatActivity {
                         editor.putString("Username", username);
                         editor.putString("Email", email);
                         editor.putString("Avatar_addr", avatar_path);
+                        editor.putString("firstLogin", "false");
                         editor.commit();
+                        if (firstLogin.equals("true")){
+                            startOtherActivity();
+
+                        }
                         System.out.println("true");
 
-                        //startOtherActivity();
+
 
                     }
                 });

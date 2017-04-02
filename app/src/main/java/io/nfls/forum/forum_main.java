@@ -113,10 +113,10 @@ public class forum_main extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 if(isLogedin.equals("true")) {
-
                     startActivity(new Intent(forum_main.this, DetailedUserInformation.class));
                 } else{
                     startActivity(new Intent(forum_main.this, UserLogin.class));
+                    finish();
                 }
 
             }

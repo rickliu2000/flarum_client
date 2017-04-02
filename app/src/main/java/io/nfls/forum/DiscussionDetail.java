@@ -1,5 +1,6 @@
 package io.nfls.forum;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +19,7 @@ import static android.R.attr.value;
  * Created by Rickliu on 4/2/17.
  */
 
-public class DiscussionDetail extends AppCompatActivity {
+public class DiscussionDetail extends Activity {
     private WebView discussionDetailView;
     String value="";
     String cookie="";

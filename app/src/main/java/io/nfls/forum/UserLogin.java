@@ -1,5 +1,10 @@
 package io.nfls.forum;
 
+import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -100,7 +105,10 @@ public class UserLogin extends AppCompatActivity {
         startActivity(new Intent(UserLogin.this,DetailedUserInformation.class));
        finish();
 
+
+
     }
+
 
 
    private class LoginIO extends AsyncTask<Integer, String, Integer> {
