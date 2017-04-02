@@ -46,12 +46,14 @@ public class DiscussionDetail extends AppCompatActivity {
 
             public void onLoadResource(WebView view, String url) {
                 //System.out.println("666");
-                //System.out.println(url);
+                System.out.println(url);
 
                 if (url.equals("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser%2CstartPost%2Ctags&&")) {
                     onBackPressed();
 
                     return ;
+                } else if(url.equals("https://login.nfls.io/operation/")){
+                    startActivity(new Intent(DiscussionDetail.this, UserLogin.class));
                 }
             }
 
