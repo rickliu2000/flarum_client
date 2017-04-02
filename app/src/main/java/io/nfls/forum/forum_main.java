@@ -79,6 +79,7 @@ public class forum_main extends AppCompatActivity
     ImageView imView;
     private long exitTime = 0;
     int[] discussionID=new int[20];
+    String[] slug=new String[20];
     String[] UserID=new String[40];
     String[] UserName=new String[40];
     @Override
@@ -207,9 +208,10 @@ public class forum_main extends AppCompatActivity
                 Object string=adapter.getItem(position);
                 Long sss =adapter.getItemId(position);
                 int numcount=sss.intValue();
-                System.out.println("**********"+ discussionID[numcount]);
-                Intent intent = new Intent(forum_main.this, DiscussionDetail_abandoned.class);
-                intent.putExtra("DISCUSSION_ID",Integer.toString(discussionID[numcount]));
+                System.out.println("**********"+ Integer.toString(discussionID[numcount])+"-"+slug[numcount]);
+                Intent intent = new Intent(forum_main.this, DiscussionDetail.class);
+
+                intent.putExtra("DISCUSSION_ID",Integer.toString(discussionID[numcount])+"-"+slug[numcount]);
                 startActivity(intent);
 
             }
@@ -313,6 +315,7 @@ public class forum_main extends AppCompatActivity
                     //------------------start attributes------------------
                     JSONObject attributes_json=new JSONObject(attributes);
                     title=attributes_json.getString("title");
+                    slug[i]=attributes_json.getString("slug");
                     commentsCount=attributes_json.getString("commentsCount");
                     startTime=attributes_json.getString("startTime");
                     //------------------end of attributes------------------

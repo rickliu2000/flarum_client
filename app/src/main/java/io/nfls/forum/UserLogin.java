@@ -20,6 +20,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,6 +51,7 @@ public class UserLogin extends AppCompatActivity {
     String boundary =  "WebKitFormBoundary7MA4YWxkTrZu0gW";
     String json="";
     String isLogedin="";
+    String cookiefinal="";
     //private List<NameValuePair> data = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,32 +90,10 @@ public class UserLogin extends AppCompatActivity {
         }
     }
     public void login(String username, String password) {
-        //Toast.makeText(UserLogin.this, username + password, Toast.LENGTH_SHORT).show();
-        /*
-        try {
-            // 首先最外层是{}，是创建一个对象
-            JSONObject UserLogin = new JSONObject();
-            // 第一个键phone的值是数组，所以需要创建数组对象
-            //JSONArray phone = new JSONArray();
-            //phone.put("12345678").put("87654321");
-            //UserLogin.put("phone", phone);
 
-            UserLogin.put("username", username);
-            UserLogin.put("password", password);
-            content = String.valueOf(UserLogin);
-            System.out.println(content);
-        } catch (JSONException ex) {
-            // 键为null或使用json不支持的数字格式(NaN, infinities)
-            throw new RuntimeException(ex);
-        }
-        */
-        // Add your data
-        //writer = new BufferedWriter(new OutputStreamWriter(dataOutputStream, "UTF-8"));
-        //new AlertDialog.Builder(this).setTitle("登陆").setMessage("登陆中").show();
-        //System.out.println(content);
         mTask = new LoginIO();
         mTask.execute();
-        //System.out.println("ok");
+
     }
     private void startOtherActivity()
     {
@@ -181,20 +161,12 @@ public class UserLogin extends AppCompatActivity {
 
                     token = jsonObject
                             .getString("token");
-                    //System.out.println(token);
-                    // id = jsonObject
-                    //   .optInt("userId");
-                    //System.out.println("FUCKING JSON");
                     success=true;
                 } catch (JSONException ex) {
-                    //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
+
                     System.out.println("JSON fucked");
 
                 }
-                //Toast.makeText(UserLogin.this, token + id, Toast.LENGTH_LONG).show();
-                //System.out.println(token+"--"+id);
-
-
 
 
             }else {
@@ -203,86 +175,52 @@ public class UserLogin extends AppCompatActivity {
 
                     message = jsonObject
                             .getString("message");
-                    //System.out.println(token);
-                    // id = jsonObject
-                    //   .optInt("userId");
-                    //System.out.println("FUCKING JSON");
-                    //success=true;
+
                 } catch (JSONException ex) {
-                    //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
                     System.out.println("JSON fucked");
 
                 }
             }
-
-
-
-
-            /*String urlPath = "https://app.nfls.io/API/User/User.php?action=UserLogin";
-            URL url = null;
-            try {
-                url = new URL(urlPath);
-            } catch (MalformedURLException ex) {
-                //System.out.println("666");
-              // Toast.makeText(UserLogin.this, "666", Toast.LENGTH_SHORT).show();
-            }
-            //System.out.println("fuck");
-            HttpURLConnection conn = null;
-            try {
-                conn = (HttpURLConnection) url.openConnection();
-            } catch (IOException ex) {
-
-            }
-            conn.setConnectTimeout(5000);
-            try {
-                conn.setDoOutput(true);
-                conn.setRequestMethod("POST");
-            } catch (ProtocolException ex) {
-               // Toast.makeText(UserLogin.this, "ProtocolException", Toast.LENGTH_SHORT).show();
-                System.out.println("bad protocol");
-            }
-            //conn.setRequestProperty("ser-Agent", "Fiddler");
-            //conn.setRequestProperty("Content-Type", "multipart/form-data");
-            conn.setRequestProperty("Connection", "Keep-Alive");
-            conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=--" + boundary);
-            //conn.setRequestProperty("username",username);
-            //conn.setRequestProperty("password",password);
-            contentPass="Content-Disposition: form-data; name\"=password\"" + lineEnd+ password +lineEnd;
-            contentUser="Content-Disposition: form-data; name=\"username\"" + lineEnd+ username +lineEnd;
-            contentEnd=twoHyphens + boundary + lineEnd;
-            contentTerrible=contentEnd+contentUser+contentEnd+contentPass;
+            HttpClient httpclientcookie = new DefaultHttpClient();
+            HttpPost httppostcookie = new HttpPost("https://app.nfls.io/API/User/User.php?action=LoginForumAccountAsSame");
 
             try {
-                OutputStream os = conn.getOutputStream();
+                // Add your data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                nameValuePairs.add(new BasicNameValuePair("username", username));
+                nameValuePairs.add(new BasicNameValuePair("password", password));
+                httppostcookie.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-               // System.out.println(0);
-                os.write(contentTerrible.getBytes());
+                // Execute HTTP Post Request
+                HttpResponse response = httpclientcookie.execute(httppostcookie);
 
-                os.write(contentUser.getBytes());
-
-                os.write(contentEnd.getBytes());
-                os.write(contentPass.getBytes());
-
-                os.flush();
-               //System.out.println(1);
-                os.close();
-                code = conn.getResponseCode();
-                //System.out.println(code);
-                //System.out.println(3);
-
-                //InputStream is = conn.getInputStream();
                 //System.out.println(4);
-                //String json = NetUtils.readString(is);
-               // System.out.println(json);
+                json = EntityUtils.toString(response.getEntity());
 
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+                System.out.println("Protool Error");
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                System.out.println("IO Error");
+            }
+            System.out.println(json);
+            System.out.println(1);
+            json=json.substring(1,json.length()-1);
+            System.out.println(json);
+            String cookieArrayTemp[]=json.split(",");
+            //System.out.println(cookie);
+            String cookietemp="";
+            for (int i=0;i<cookieArrayTemp.length;i++){
+                cookietemp=cookietemp+cookieArrayTemp[i].substring(1,cookieArrayTemp[i].length()-1)+"; ";
 
+            }
+            cookietemp=cookietemp.substring(0,cookietemp.length()-2);
 
-
-
-            } catch (IOException ex) {
-                //Toast.makeText(UserLogin.this, "IO Error", Toast.LENGTH_SHORT).show();
-                //System.out.println("IO fucked");
-            }*/
+            System.out.println(cookietemp);
+            String cookieArray[]=cookietemp.split("; ");
+                cookiefinal=cookieArray[0]+"; "+cookieArray[4]+"; "+cookieArray[5];
+            System.out.println(cookiefinal);
 
 
 
@@ -291,6 +229,7 @@ public class UserLogin extends AppCompatActivity {
                    if(success){
                        SharedPreferences.Editor editor = getSharedPreferences("lock", MODE_PRIVATE).edit();
                        editor.putString("token", token);
+                       editor.putString("cookie", cookiefinal);
                        editor.commit();
                        startOtherActivity();
                    }else if (status.equals("error")){
