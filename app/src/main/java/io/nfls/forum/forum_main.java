@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -209,7 +208,7 @@ public class forum_main extends AppCompatActivity
                 Long sss =adapter.getItemId(position);
                 int numcount=sss.intValue();
                 System.out.println("**********"+ discussionID[numcount]);
-                Intent intent = new Intent(forum_main.this, DiscussionDetail.class);
+                Intent intent = new Intent(forum_main.this, DiscussionDetail_abandoned.class);
                 intent.putExtra("DISCUSSION_ID",Integer.toString(discussionID[numcount]));
                 startActivity(intent);
 
