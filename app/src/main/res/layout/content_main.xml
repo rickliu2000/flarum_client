@@ -13,21 +13,32 @@
     tools:context="io.nfls.forum.forum_main"
     tools:showIn="@layout/app_bar_main">
 
-    <TextView
-        android:id="@+id/textView3"
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:text="Welcome to NFLS community!"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"
-        android:layout_alignParentEnd="true" />
+        android:textSize="18sp" />
+
     <ListView
         android:id="@+id/discussion_List"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/textView3"
+        android:divider="#00F8F8F8"
+        android:dividerHeight="8px"
+        android:layout_below="@+id/title"
         android:layout_alignParentStart="true" />
+
 </RelativeLayout>

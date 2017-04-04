@@ -1,14 +1,24 @@
 package io.nfls.forum;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -22,6 +32,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,12 +46,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Rickliu on 2/6/17.
@@ -64,10 +81,11 @@ public class forum_main extends AppCompatActivity
     String lastUserid="";
     String startUserName="";
     String lastUserName="";
+    String startUserAvatarUrl="";
     String UserData="";
     String tags="";
     String id="";
-    final ArrayList<String> list = new ArrayList<String>();
+    List<Map<String, Object>> list=new ArrayList<Map<String,Object>>();
     Context context=this;
     String isLogedin="";
     String username="";
@@ -76,12 +94,18 @@ public class forum_main extends AppCompatActivity
     String imageUrl="";
     URL myFileUrl = null;
     Bitmap bitmap = null;
+    Bitmap[] userBitMap=new Bitmap[40];
     ImageView imView;
     private long exitTime = 0;
     int[] discussionID=new int[20];
     String[] slug=new String[20];
     String[] UserID=new String[40];
+    String[] UserAvatarPath=new String[40];
     String[] UserName=new String[40];
+    String[] discussionTitle=new String[40];
+    String[] discussionInfo=new String[40];
+    String[] UserAvatarPathOrdered=new String[40];
+    boolean isUser=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,16 +119,21 @@ public class forum_main extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
             }
         });
         LayoutInflater inflater = (LayoutInflater)context.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
         View barView = inflater.inflate(R.layout.nav_header_main, null);
+        final ConnectivityManager con=(ConnectivityManager)getSystemService(Activity.CONNECTIVITY_SERVICE);
+        boolean wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+        boolean internet=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
+        System.out.println(wifi+" "+internet);
+
+
         SharedPreferences read = getSharedPreferences("lock",MODE_PRIVATE);
         isLogedin = read.getString("isLogin", "");
         System.out.println(isLogedin);
-        GetDiscussionTask= new GetDiscussion();
-        GetDiscussionTask.execute();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
@@ -121,6 +150,44 @@ public class forum_main extends AppCompatActivity
 
             }
         });
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+
+        if(wifi|internet){
+            if (!ping()) {
+                Toast.makeText(getApplicationContext(), "Our server lost his girlfriend 😭He is now hanging around",
+                        Toast.LENGTH_SHORT).show();
+                TextView status=(TextView)findViewById(R.id.title);
+                status.setText("Hangin’ around, Nothing to do but frown.");
+                while (!ping()){
+                    try{
+                        Thread.sleep(5000);
+                    }catch (InterruptedException e) {}
+                }
+
+            }
+        }else{
+            Toast.makeText(getApplicationContext(), "Where do you think you are？On Mars？ Where's your connection",
+                    Toast.LENGTH_SHORT).show();
+            TextView status=(TextView)findViewById(R.id.title);
+            status.setText("It's suggested that you go back to the Earth.No internet :(");
+            while(!(wifi|internet)){
+                wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+                internet=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
+                try{
+                    Thread.sleep(5000);
+                }catch (InterruptedException e) {}
+            }
+        }
+        TextView status=(TextView)findViewById(R.id.title);
+        status.setText("Welcome to NFLS Community!");
+
+
+
         if(isLogedin.equals("true")){
            username=read.getString("Username", "");
            email=read.getString("Email", "");
@@ -131,18 +198,17 @@ public class forum_main extends AppCompatActivity
            Username.setText(username);
            TextView Email=(TextView)header.findViewById(R.id.email_bar);
            Email.setText(email);
-           GetDetailTask= new GetDetail();
-           GetDetailTask.execute();
+
+            GetDetailTask= new GetDetail();
+            GetDetailTask.execute(0);
 
 
        }
+        GetDiscussionTask= new GetDiscussion();
+        GetDiscussionTask.execute();
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+
 
 
     }
@@ -198,9 +264,40 @@ public class forum_main extends AppCompatActivity
     }
 
     public void setlist(){
+        isUser=true;
+        for(int i=0; i<20;i++){
+            GetDetailTask= new GetDetail();
+            GetDetailTask.execute(i);
+        }
+
+        for(int i=0; i<20;i++){
+            if(discussionInfo[i]!=null) {
+                while (userBitMap[i]==null){
+                    try {
+                        Thread.currentThread().sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println("Value i "+i);
+                Map<String, Object> map = new HashMap<String, Object>();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                userBitMap[i].compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] b = baos.toByteArray();
+                String temp = Base64.encodeToString(b, Base64.DEFAULT);
+                map.put("image", temp);
+                map.put("title", discussionTitle[i]);
+                map.put("info", discussionInfo[i]);
+                list.add(map);
+            }
+        }
+
+
         final ArrayAdapter adapter = new ArrayAdapter(this,R.layout.discussion_list,list);
+        final ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar);
+        bar.setVisibility(View.INVISIBLE);
         ListView listView = (ListView) findViewById(R.id.discussion_List);
-        listView.setAdapter(adapter);
+        listView.setAdapter(new DiscussionListAdapter(this, list));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -220,8 +317,6 @@ public class forum_main extends AppCompatActivity
 
     }
 
-
-
     private void showAvatar(){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -229,36 +324,108 @@ public class forum_main extends AppCompatActivity
         imView = (ImageView) header.findViewById(R.id.avatar_bar);
         imView.setImageBitmap(bitmap);
     }
+
+
+    public static boolean ping() {
+        String result = null;
+        try {
+            String ip = "ss-hk.nfls.io";
+            Process p = Runtime.getRuntime().exec("ping -c 1 -w 100 " + ip);
+            InputStream input = p.getInputStream();
+            BufferedReader in = new BufferedReader(new InputStreamReader(input));
+            StringBuffer stringBuffer = new StringBuffer();
+            String content = "";
+            while ((content = in.readLine()) != null) {
+                stringBuffer.append(content);
+            }
+            //Log.i("TTT", "result content : " + stringBuffer.toString());
+            int status = p.waitFor();
+            if (status == 0) {
+                result = "successful~";
+                return true;
+            } else {
+                result = "failed~ cannot reach the IP address";
+            }
+        } catch (IOException e) {
+            result = "failed~ IOException";
+        } catch (InterruptedException e) {
+            result = "failed~ InterruptedException";
+        } finally {
+            Log.i("TTT", "result = " + result);
+        }
+        return false;
+    }
+
+
     private class GetDetail extends AsyncTask<Integer, String, Integer> {
         @Override
         protected Integer doInBackground(Integer... params) {
-                imageUrl="https://forum.nfls.io/assets/avatars/"+avatar_path;
-                try {
-                    myFileUrl = new URL(imageUrl);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
+            System.out.println("???");
+             int i=params[0];
+            System.out.println("Value i "+i);
+                if (isUser){
+
+                    imageUrl = UserAvatarPathOrdered[i];
+                } else {
+                    imageUrl = "https://forum.nfls.io/assets/avatars/" + avatar_path;
                 }
-                try {
-                    HttpURLConnection conn = (HttpURLConnection) myFileUrl
-                            .openConnection();
-                    conn.setDoInput(true);
-                    conn.connect();
-                    InputStream is = conn.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(is);
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    if (avatar_path.equals(null)){
-                        Toast.makeText(forum_main.this, "No Avatar", Toast.LENGTH_LONG).show();
+                if((isUser)||(!isUser&&avatar_path!=null)) {
+                    try {
+                        myFileUrl = new URL(imageUrl);
+                        System.out.println(myFileUrl);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
                     }
-                    else {
-                       showAvatar();
+                    try {
+                        HttpURLConnection conn = (HttpURLConnection) myFileUrl
+                                .openConnection();
+                        conn.setDoInput(true);
+                        conn.connect();
+                        InputStream is = conn.getInputStream();
+                        bitmap = BitmapFactory.decodeStream(is);
+                        is.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
-            });
+            Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
+                    .getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(output);
+
+            final int color = 0xff424242;
+            final Paint paint = new Paint();
+            final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            final RectF rectF = new RectF(rect);
+            final float roundPx = 96;
+
+            paint.setAntiAlias(true);
+            canvas.drawARGB(0, 0, 0, 0);
+            paint.setColor(color);
+            canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, rect, rect, paint);
+            bitmap=output;
+
+            if(isUser){
+                if (UserAvatarPathOrdered[i]==null) {
+                    bitmap=null;
+                } else{
+                    userBitMap[i]=bitmap;
+                }
+
+            }else {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+
+                        if (avatar_path.isEmpty()) {
+                            Toast.makeText(forum_main.this, "No Avatar", Toast.LENGTH_LONG).show();
+                        } else {
+                            showAvatar();
+                        }
+                    }
+                });
+            }
             return null;
         }
     }
@@ -301,10 +468,12 @@ public class forum_main extends AppCompatActivity
                     String name_attributes=UserInfo.getString("attributes");
                     JSONObject username_json=new JSONObject(name_attributes);
                     UserName[i]=username_json.getString("username");
+                    UserAvatarPath[i]=username_json.getString("avatarUrl");
                     UserID[i]=UserId;
                     //System.out.println(UserName[i]+" "+UserID[i]);
 
                 }
+
                 for(int i=0;i<num;i++){
                     //System.out.println(i);
                     JSONObject discussion=discussionList.getJSONObject(i);
@@ -341,15 +510,25 @@ public class forum_main extends AppCompatActivity
                         if(startUserid.equals(UserID[j])){
                             //System.out.println(j+" "+UserID[j]+" "+UserName[j]);
                             startUserName=UserName[j];
+                            UserAvatarPathOrdered[i]=UserAvatarPath[j];
                         }
                         if(lastUserid.equals(UserID[j])){
                             lastUserName=UserName[j];
                         }
                     }
                     System.out.println(i+" "+id+" "+type+" "+title+" author:"+startUserName+" Last reply:"+lastUserName +" post time:"+startTime+" reply:"+commentsCount);
-                    list.add(title+" author:"+startUserName+" Last reply:"+lastUserName+" post time:"+startTime+" reply:"+commentsCount);
+                    //list.add(title+" author:"+startUserName+" Last reply:"+lastUserName+" post time:"+startTime+" reply:"+commentsCount);
+                    if(UserAvatarPathOrdered[i]=="null"){
+                        System.out.println(i+" lacks avatar");
+                        UserAvatarPathOrdered[i]="https://forum.nfls.io/assets/avatars/nfls_forum.png";
+                    }
+                    System.out.println(UserAvatarPathOrdered[i]);
+
+                    discussionTitle[i]=title;
+                    discussionInfo[i]=" Last reply:"+lastUserName;
 
                     discussionID[i]=Integer.valueOf(id);
+
                 }
 
             }catch (JSONException ex){

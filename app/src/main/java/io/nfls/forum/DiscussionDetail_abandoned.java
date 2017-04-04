@@ -1,24 +1,12 @@
 package io.nfls.forum;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -72,7 +59,7 @@ public class DiscussionDetail_abandoned extends AppCompatActivity{
 
     }
     public void setlist(){
-        final ArrayAdapter adapter = new ArrayAdapter(this,R.layout.discussion_detail_list,R.id.label,list);
+        final ArrayAdapter adapter = new ArrayAdapter(this,R.layout.discussion_list,R.id.label,list);
         ListView listView = (ListView) findViewById(R.id.discussionDetail_List);
         listView.setAdapter(adapter);
 
