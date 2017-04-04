@@ -119,6 +119,9 @@ public class forum_main extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                Intent intent = new Intent(forum_main.this, NewDiscussion.class);
+
+                startActivity(intent);
 
             }
         });
@@ -247,6 +250,16 @@ public class forum_main extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+        GetDiscussionTask= new GetDiscussion();
+        GetDiscussionTask.execute();
+        final ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar);
+        bar.setVisibility(View.VISIBLE);
+        list.clear();
+
     }
 
 

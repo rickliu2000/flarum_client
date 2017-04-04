@@ -19,6 +19,7 @@
         <activity android:name="io.nfls.forum.DetailedUserInformation" ></activity>
         <activity android:name="io.nfls.forum.UserLogin" ></activity>
         <activity android:name="io.nfls.forum.DiscussionDetail" ></activity>
+        <activity android:name="io.nfls.forum.NewDiscussion" ></activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
