@@ -28,6 +28,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -97,8 +98,8 @@ public class forum_main extends AppCompatActivity
     Bitmap[] userBitMap=new Bitmap[40];
     ImageView imView;
     private long exitTime = 0;
-    int[] discussionID=new int[20];
-    String[] slug=new String[20];
+    int[] discussionID=new int[5000];
+    String[] slug=new String[5000];
     String[] UserID=new String[40];
     String[] UserAvatarPath=new String[40];
     String[] UserName=new String[40];
@@ -106,6 +107,11 @@ public class forum_main extends AppCompatActivity
     String[] discussionInfo=new String[40];
     String[] UserAvatarPathOrdered=new String[40];
     boolean isUser=false;
+    int pageCount=0;
+    int postCount=-1;
+    int lastPageFlag=-1;
+    int newPostFlag=-1;
+    int curItem=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +125,7 @@ public class forum_main extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                newPostFlag=0;
                 Intent intent = new Intent(forum_main.this, NewDiscussion.class);
 
                 startActivity(intent);
@@ -233,17 +240,9 @@ public class forum_main extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        if (id == R.id.nav_about) {
+            startActivity(new Intent(forum_main.this, About.class));
+        } else if (id == R.id.nav_settings) {
 
         }
 
@@ -253,12 +252,31 @@ public class forum_main extends AppCompatActivity
     }
     @Override
     public void onResume() {
-        super.onResume();  // Always call the superclass method first
-        GetDiscussionTask= new GetDiscussion();
-        GetDiscussionTask.execute();
-        final ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar);
-        bar.setVisibility(View.VISIBLE);
-        list.clear();
+        super.onResume();
+        // Always call the superclass method first
+        if (newPostFlag!=-1) {
+            slug=new String[5000];
+            UserID=new String[40];
+            UserAvatarPath=new String[40];
+            UserName=new String[40];
+            discussionTitle=new String[40];
+            discussionInfo=new String[40];
+            UserAvatarPathOrdered=new String[40];
+            bitmap=null;
+            //isUser=false;
+            pageCount=0;
+            postCount=-1;
+            lastPageFlag=-1;
+            newPostFlag=-1;
+            curItem=0;
+            GetDiscussionTask = new GetDiscussion();
+            GetDiscussionTask.execute();
+            final ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar);
+            bar.setVisibility(View.VISIBLE);
+            ListView listView = (ListView) findViewById(R.id.discussion_List);
+            listView.setAdapter(null);
+            list.clear();
+        }
 
     }
 
@@ -292,25 +310,65 @@ public class forum_main extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-                System.out.println("Value i "+i);
-                Map<String, Object> map = new HashMap<String, Object>();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                userBitMap[i].compress(Bitmap.CompressFormat.PNG, 100, baos);
-                byte[] b = baos.toByteArray();
-                String temp = Base64.encodeToString(b, Base64.DEFAULT);
-                map.put("image", temp);
-                map.put("title", discussionTitle[i]);
-                map.put("info", discussionInfo[i]);
-                list.add(map);
+                //System.out.println("Value i "+i);
+                if(lastPageFlag==-1) {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    userBitMap[i].compress(Bitmap.CompressFormat.PNG, 100, baos);
+                    byte[] b = baos.toByteArray();
+                    String temp = Base64.encodeToString(b, Base64.DEFAULT);
+                    map.put("image", temp);
+                    map.put("title", discussionTitle[i]);
+                    map.put("info", discussionInfo[i]);
+                    list.add(map);
+                }
             }
+
         }
 
 
         final ArrayAdapter adapter = new ArrayAdapter(this,R.layout.discussion_list,list);
         final ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar);
         bar.setVisibility(View.INVISIBLE);
-        ListView listView = (ListView) findViewById(R.id.discussion_List);
+        final ListView listView = (ListView) findViewById(R.id.discussion_List);
         listView.setAdapter(new DiscussionListAdapter(this, list));
+        listView.setSelection(curItem);
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                switch (scrollState) {
+                    // 当不滚动时
+                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
+                        // 判断滚动到底部
+                        if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
+                            System.out.println("last");
+                            if(lastPageFlag==-1) {
+                                pageCount++;
+                                UserAvatarPath=new String[40];
+                                UserName=new String[40];
+                                discussionTitle=new String[40];
+                                discussionInfo=new String[40];
+                                UserAvatarPathOrdered=new String[40];
+                                GetDiscussionTask = new GetDiscussion();
+                                GetDiscussionTask.execute();
+                                bar.setVisibility(View.VISIBLE);
+
+
+
+                            }
+                        }
+                        break;
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+                curItem = firstVisibleItem+2;
+
+            }
+        });
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -450,7 +508,7 @@ public class forum_main extends AppCompatActivity
 
 
             HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httppost = new HttpGet("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser");
+            HttpGet httppost = new HttpGet("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser&page%5Boffset%5D="+pageCount*20);
 
             try {
                 HttpResponse response = httpclient.execute(httppost);
@@ -473,6 +531,10 @@ public class forum_main extends AppCompatActivity
             try {
                 JSONArray discussionList=jsonObject.getJSONArray("data");
                 int num=discussionList.length();
+                if(num==0){
+                    System.out.println("No more posts");
+                    lastPageFlag=0;
+                }
                 JSONArray UserList=jsonObject.getJSONArray("included");
                 int Usernum=UserList.length();
                 for (int i=0;i<Usernum;i++){
@@ -488,7 +550,7 @@ public class forum_main extends AppCompatActivity
                 }
 
                 for(int i=0;i<num;i++){
-                    //System.out.println(i);
+                    postCount++;
                     JSONObject discussion=discussionList.getJSONObject(i);
                     //System.out.println(i+" "+discussion);
                     id=discussion.getString("id");
@@ -498,7 +560,7 @@ public class forum_main extends AppCompatActivity
                     //------------------start attributes------------------
                     JSONObject attributes_json=new JSONObject(attributes);
                     title=attributes_json.getString("title");
-                    slug[i]=attributes_json.getString("slug");
+                    slug[postCount]=attributes_json.getString("slug");
                     commentsCount=attributes_json.getString("commentsCount");
                     startTime=attributes_json.getString("startTime");
                     //------------------end of attributes------------------
@@ -540,7 +602,7 @@ public class forum_main extends AppCompatActivity
                     discussionTitle[i]=title;
                     discussionInfo[i]=" Last reply:"+lastUserName;
 
-                    discussionID[i]=Integer.valueOf(id);
+                    discussionID[postCount]=Integer.valueOf(id);
 
                 }
 
