@@ -112,6 +112,8 @@ public class forum_main extends AppCompatActivity
     int lastPageFlag=-1;
     int newPostFlag=-1;
     int curItem=0;
+    int Usernum=0;
+    int num=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,10 +137,8 @@ public class forum_main extends AppCompatActivity
         LayoutInflater inflater = (LayoutInflater)context.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
         View barView = inflater.inflate(R.layout.nav_header_main, null);
-        final ConnectivityManager con=(ConnectivityManager)getSystemService(Activity.CONNECTIVITY_SERVICE);
-        boolean wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
-        boolean internet=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
-        System.out.println(wifi+" "+internet);
+
+
 
 
         SharedPreferences read = getSharedPreferences("lock",MODE_PRIVATE);
@@ -167,34 +167,7 @@ public class forum_main extends AppCompatActivity
         toggle.syncState();
 
 
-        if(wifi|internet){
-            if (!ping()) {
-                Toast.makeText(getApplicationContext(), "Our server lost his girlfriend 😭He is now hanging around",
-                        Toast.LENGTH_SHORT).show();
-                TextView status=(TextView)findViewById(R.id.title);
-                status.setText("Hangin’ around, Nothing to do but frown.");
-                while (!ping()){
-                    try{
-                        Thread.sleep(5000);
-                    }catch (InterruptedException e) {}
-                }
 
-            }
-        }else{
-            Toast.makeText(getApplicationContext(), "Where do you think you are？On Mars？ Where's your connection",
-                    Toast.LENGTH_SHORT).show();
-            TextView status=(TextView)findViewById(R.id.title);
-            status.setText("It's suggested that you go back to the Earth.No internet :(");
-            while(!(wifi|internet)){
-                wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
-                internet=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
-                try{
-                    Thread.sleep(5000);
-                }catch (InterruptedException e) {}
-            }
-        }
-        TextView status=(TextView)findViewById(R.id.title);
-        status.setText("Welcome to NFLS Community!");
 
 
 
@@ -255,6 +228,7 @@ public class forum_main extends AppCompatActivity
         super.onResume();
         // Always call the superclass method first
         if (newPostFlag!=-1) {
+            discussionID=new int[5000];
             slug=new String[5000];
             UserID=new String[40];
             UserAvatarPath=new String[40];
@@ -304,6 +278,7 @@ public class forum_main extends AppCompatActivity
         for(int i=0; i<20;i++){
             if(discussionInfo[i]!=null) {
                 while (userBitMap[i]==null){
+                    System.out.println("Stop");
                     try {
                         Thread.currentThread().sleep(500);
                     } catch (InterruptedException e) {
@@ -342,20 +317,45 @@ public class forum_main extends AppCompatActivity
                         // 判断滚动到底部
                         if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
                             System.out.println("last");
-                            if(lastPageFlag==-1) {
-                                pageCount++;
-                                UserAvatarPath=new String[40];
-                                UserName=new String[40];
-                                discussionTitle=new String[40];
-                                discussionInfo=new String[40];
-                                UserAvatarPathOrdered=new String[40];
-                                GetDiscussionTask = new GetDiscussion();
-                                GetDiscussionTask.execute();
-                                bar.setVisibility(View.VISIBLE);
+                            final ConnectivityManager con=(ConnectivityManager)getSystemService(Activity.CONNECTIVITY_SERVICE);
+                            boolean wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+                            boolean internet=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
+                            System.out.println(wifi+" "+internet);
+                            if(wifi|internet){
+                                TextView status = (TextView) findViewById(R.id.title);
+                                status.setText("Welcome to NFLS Community!");
+                                if (!ping()) {
 
-
+                                    Toast.makeText(getApplicationContext(), "Our server lost his girlfriend 😭He is now hanging around",
+                                            Toast.LENGTH_SHORT).show();
+                                    status.setText("Hangin’ around, Nothing to do but frown.");
+                                }else {
+                                    if (lastPageFlag == -1) {
+                                        pageCount++;
+                                        UserAvatarPath = new String[40];
+                                        UserName = new String[40];
+                                        discussionTitle = new String[40];
+                                        discussionInfo = new String[40];
+                                        UserAvatarPathOrdered = new String[40];
+                                        userBitMap=new Bitmap[40];
+                                        UserID=new String[40];
+                                        bitmap=null;
+                                        GetDiscussionTask = new GetDiscussion();
+                                        GetDiscussionTask.execute();
+                                        bar.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                            }else{
+                                System.out.println("No internet");
+                                Toast.makeText(getApplicationContext(), "Where do you think you are？On Mars？ Where's your connection",
+                                        Toast.LENGTH_SHORT).show();
+                                TextView status=(TextView)findViewById(R.id.title);
+                                status.setText("It's suggested that you go back to the Earth.No internet :(");
 
                             }
+
+
+
                         }
                         break;
                 }
@@ -433,7 +433,7 @@ public class forum_main extends AppCompatActivity
         protected Integer doInBackground(Integer... params) {
             System.out.println("???");
              int i=params[0];
-            System.out.println("Value i "+i);
+            //System.out.println("Value i "+i);
                 if (isUser){
 
                     imageUrl = UserAvatarPathOrdered[i];
@@ -459,30 +459,36 @@ public class forum_main extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-            Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
-                    .getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(output);
+            if(bitmap==null){
 
-            final int color = 0xff424242;
-            final Paint paint = new Paint();
-            final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            final RectF rectF = new RectF(rect);
-            final float roundPx = 96;
+            }else {
+                Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
+                        .getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(output);
+                final int color = 0xff424242;
+                final Paint paint = new Paint();
+                final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                final RectF rectF = new RectF(rect);
+                final float roundPx = 96;
 
-            paint.setAntiAlias(true);
-            canvas.drawARGB(0, 0, 0, 0);
-            paint.setColor(color);
-            canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+                paint.setAntiAlias(true);
+                canvas.drawARGB(0, 0, 0, 0);
+                paint.setColor(color);
+                canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, rect, rect, paint);
-            bitmap=output;
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+                canvas.drawBitmap(bitmap, rect, rect, paint);
+                bitmap=output;
+
+            }
+
 
             if(isUser){
                 if (UserAvatarPathOrdered[i]==null) {
                     bitmap=null;
                 } else{
                     userBitMap[i]=bitmap;
+                    System.out.println(i+" sent");
                 }
 
             }else {
@@ -503,8 +509,36 @@ public class forum_main extends AppCompatActivity
 
 
     private class GetDiscussion extends AsyncTask<Integer, String, Integer> {
+
         @Override
         protected Integer doInBackground(Integer... params) {
+
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    final ConnectivityManager con=(ConnectivityManager)getSystemService(Activity.CONNECTIVITY_SERVICE);
+                    boolean wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+                    boolean internet=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
+                    System.out.println(wifi+" "+internet);
+                    if(wifi|internet){
+                        if (!ping()) {
+                            Toast.makeText(getApplicationContext(), "Our server lost his girlfriend 😭He is now hanging around",
+                                    Toast.LENGTH_SHORT).show();
+                            TextView status = (TextView) findViewById(R.id.title);
+                            status.setText("Hangin’ around, Nothing to do but frown.");
+                        }
+                        TextView status = (TextView) findViewById(R.id.title);
+                        status.setText("Welcome to NFLS Community!");
+                    }else{
+                        System.out.println("No internet");
+                        Toast.makeText(getApplicationContext(), "Where do you think you are？On Mars？ Where's your connection",
+                                Toast.LENGTH_SHORT).show();
+                        TextView status=(TextView)findViewById(R.id.title);
+                        status.setText("It's suggested that you go back to the Earth.No internet :(");
+
+                    }
+
+                }
+            });
 
 
             HttpClient httpclient = new DefaultHttpClient();
@@ -527,87 +561,88 @@ public class forum_main extends AppCompatActivity
             } catch (JSONException ex) {
                 System.out.println("Server Error");
             }
-            //System.out.println(status);
-            try {
-                JSONArray discussionList=jsonObject.getJSONArray("data");
-                int num=discussionList.length();
-                if(num==0){
-                    System.out.println("No more posts");
-                    lastPageFlag=0;
-                }
-                JSONArray UserList=jsonObject.getJSONArray("included");
-                int Usernum=UserList.length();
-                for (int i=0;i<Usernum;i++){
-                    JSONObject UserInfo=UserList.getJSONObject(i);
-                    String UserId=UserInfo.getString("id");
-                    String name_attributes=UserInfo.getString("attributes");
-                    JSONObject username_json=new JSONObject(name_attributes);
-                    UserName[i]=username_json.getString("username");
-                    UserAvatarPath[i]=username_json.getString("avatarUrl");
-                    UserID[i]=UserId;
-                    //System.out.println(UserName[i]+" "+UserID[i]);
-
-                }
-
-                for(int i=0;i<num;i++){
-                    postCount++;
-                    JSONObject discussion=discussionList.getJSONObject(i);
-                    //System.out.println(i+" "+discussion);
-                    id=discussion.getString("id");
-                    type=discussion.getString("type");
-                    attributes=discussion.getString("attributes");
-                    //System.out.println(attributes);
-                    //------------------start attributes------------------
-                    JSONObject attributes_json=new JSONObject(attributes);
-                    title=attributes_json.getString("title");
-                    slug[postCount]=attributes_json.getString("slug");
-                    commentsCount=attributes_json.getString("commentsCount");
-                    startTime=attributes_json.getString("startTime");
-                    //------------------end of attributes------------------
-                    //username=attributes_json.getString("username");
-                    //------------------start relationships-----------------
-                    relationships=discussion.getString("relationships");
-                    JSONObject relationship_json =new JSONObject(relationships);
-                    //------------------start startUser-----------------
-                    startUser=relationship_json.getString("startUser");
-                    JSONObject startUser_json=new JSONObject(startUser);
-                    UserData=startUser_json.getString("data");
-                    JSONObject UserData_json=new JSONObject(UserData);
-                    startUserid=UserData_json.getString("id");
-                    //------------------start lastUser-----------------
-                    lastUser=relationship_json.getString("lastUser");
-                    JSONObject lastUser_json=new JSONObject(lastUser);
-                    UserData=lastUser_json.getString("data");
-                    UserData_json=new JSONObject(UserData);
-                    lastUserid=UserData_json.getString("id");
-                    //------------------end of relationships------------
-                    for (int j=0;j<40;j++){
-                        if(startUserid.equals(UserID[j])){
-                            //System.out.println(j+" "+UserID[j]+" "+UserName[j]);
-                            startUserName=UserName[j];
-                            UserAvatarPathOrdered[i]=UserAvatarPath[j];
-                        }
-                        if(lastUserid.equals(UserID[j])){
-                            lastUserName=UserName[j];
-                        }
+            if(jsonObject!=null) {//System.out.println(status);
+                try {
+                    JSONArray discussionList = jsonObject.getJSONArray("data");
+                    num = discussionList.length();
+                    if (num == 0) {
+                        System.out.println("No more posts");
+                        lastPageFlag = 0;
                     }
-                    System.out.println(i+" "+id+" "+type+" "+title+" author:"+startUserName+" Last reply:"+lastUserName +" post time:"+startTime+" reply:"+commentsCount);
-                    //list.add(title+" author:"+startUserName+" Last reply:"+lastUserName+" post time:"+startTime+" reply:"+commentsCount);
-                    if(UserAvatarPathOrdered[i]=="null"){
-                        System.out.println(i+" lacks avatar");
-                        UserAvatarPathOrdered[i]="https://forum.nfls.io/assets/avatars/nfls_forum.png";
+                    JSONArray UserList = jsonObject.getJSONArray("included");
+                    Usernum = UserList.length();
+                    for (int i = 0; i < Usernum; i++) {
+                        JSONObject UserInfo = UserList.getJSONObject(i);
+                        String UserId = UserInfo.getString("id");
+                        String name_attributes = UserInfo.getString("attributes");
+                        JSONObject username_json = new JSONObject(name_attributes);
+                        UserName[i] = username_json.getString("username");
+                        UserAvatarPath[i] = username_json.getString("avatarUrl");
+                        UserID[i] = UserId;
+                        System.out.println(UserName[i]+" "+UserID[i]+" "+UserAvatarPath[i]);
+
                     }
-                    System.out.println(UserAvatarPathOrdered[i]);
 
-                    discussionTitle[i]=title;
-                    discussionInfo[i]=" Last reply:"+lastUserName;
+                    for (int i = 0; i < num; i++) {
+                        postCount++;
+                        JSONObject discussion = discussionList.getJSONObject(i);
+                        //System.out.println(i+" "+discussion);
+                        id = discussion.getString("id");
+                        type = discussion.getString("type");
+                        attributes = discussion.getString("attributes");
+                        //System.out.println(attributes);
+                        //------------------start attributes------------------
+                        JSONObject attributes_json = new JSONObject(attributes);
+                        title = attributes_json.getString("title");
+                        slug[postCount] = attributes_json.getString("slug");
+                        commentsCount = attributes_json.getString("commentsCount");
+                        startTime = attributes_json.getString("startTime");
+                        //------------------end of attributes------------------
+                        //username=attributes_json.getString("username");
+                        //------------------start relationships-----------------
+                        relationships = discussion.getString("relationships");
+                        JSONObject relationship_json = new JSONObject(relationships);
+                        //------------------start startUser-----------------
+                        startUser = relationship_json.getString("startUser");
+                        JSONObject startUser_json = new JSONObject(startUser);
+                        UserData = startUser_json.getString("data");
+                        JSONObject UserData_json = new JSONObject(UserData);
+                        startUserid = UserData_json.getString("id");
+                        //------------------start lastUser-----------------
+                        lastUser = relationship_json.getString("lastUser");
+                        JSONObject lastUser_json = new JSONObject(lastUser);
+                        UserData = lastUser_json.getString("data");
+                        UserData_json = new JSONObject(UserData);
+                        lastUserid = UserData_json.getString("id");
+                        //------------------end of relationships------------
+                        for (int j = 0; j < 40; j++) {
+                            if (startUserid.equals(UserID[j])) {
+                                //System.out.println(j+" "+UserID[j]+" "+UserName[j]);
+                                startUserName = UserName[j];
+                                UserAvatarPathOrdered[i] = UserAvatarPath[j];
+                            }
+                            if (lastUserid.equals(UserID[j])) {
+                                lastUserName = UserName[j];
+                            }
+                        }
+                        System.out.println(i + " " + id + " " + type + " " + title + " author:" + startUserName + " Last reply:" + lastUserName + " post time:" + startTime + " reply:" + commentsCount);
+                        //list.add(title+" author:"+startUserName+" Last reply:"+lastUserName+" post time:"+startTime+" reply:"+commentsCount);
+                        if (UserAvatarPathOrdered[i] == "null") {
+                            System.out.println(i + " lacks avatar");
+                            UserAvatarPathOrdered[i] = "https://forum.nfls.io/assets/avatars/nfls_forum.png";
+                        }
+                        System.out.println(UserAvatarPathOrdered[i]);
 
-                    discussionID[postCount]=Integer.valueOf(id);
+                        discussionTitle[i] = title;
+                        discussionInfo[i] = " Last reply:" + lastUserName;
+
+                        discussionID[postCount] = Integer.valueOf(id);
+
+                    }
+
+                } catch (JSONException ex) {
 
                 }
-
-            }catch (JSONException ex){
-
             }
             runOnUiThread(new Runnable() {
                 public void run() {
