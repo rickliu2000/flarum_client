@@ -125,8 +125,8 @@ public class forum_main extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                       // .setAction("Action", null).show();
                 newPostFlag=0;
                 Intent intent = new Intent(forum_main.this, NewDiscussion.class);
 
@@ -216,7 +216,7 @@ public class forum_main extends AppCompatActivity
         if (id == R.id.nav_about) {
             startActivity(new Intent(forum_main.this, About.class));
         } else if (id == R.id.nav_settings) {
-
+            //startActivity(new Intent(forum_main.this, settings.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -332,6 +332,7 @@ public class forum_main extends AppCompatActivity
                                 }else {
                                     if (lastPageFlag == -1) {
                                         pageCount++;
+                                        System.out.println("page "+pageCount);
                                         UserAvatarPath = new String[40];
                                         UserName = new String[40];
                                         discussionTitle = new String[40];
@@ -542,6 +543,7 @@ public class forum_main extends AppCompatActivity
 
 
             HttpClient httpclient = new DefaultHttpClient();
+            System.out.println("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser&page%5Boffset%5D="+pageCount*20);
             HttpGet httppost = new HttpGet("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser&page%5Boffset%5D="+pageCount*20);
 
             try {
