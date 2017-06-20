@@ -7,29 +7,9 @@
     <Preference
         android:key="Flasher_Version"
         style="?android:preferenceInformationStyle"
-        android:title="NFLS Community APP Version"
+        android:title="APP Version"
         android:summary="1.1"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <Preference
-        android:key="Build_date"
-        style="?android:preferenceInformationStyle"
-        android:title="Build Date"
-        android:summary="20170404"
-        android:layout_height="match_parent"
-        android:layout_width="wrap_content" />
-    <Preference
-        android:key="member"
-        style="?android:preferenceInformationStyle"
-        android:title="OSC Members"
-        android:summary=""
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Preference
-        android:key="the_osc_website"
-        style="?android:preferenceInformationStyle"
-        android:title="Visit US"
-        android:summary="oscs.io"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+
 </PreferenceScreen>
