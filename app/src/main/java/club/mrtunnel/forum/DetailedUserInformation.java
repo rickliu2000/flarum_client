@@ -1,4 +1,4 @@
-package io.nfls.forum;
+package club.mrtunnel.forum;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,10 +19,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,6 +52,7 @@ public class DetailedUserInformation extends AppCompatActivity {
     String id="";
     String info_full="";
     String imageUrl ="";
+    String Userid="";
     ImageView imView;
     URL myFileUrl = null;
     Bitmap bitmap = null;
@@ -71,6 +73,7 @@ public class DetailedUserInformation extends AppCompatActivity {
     private void initView(){
         SharedPreferences read = getSharedPreferences("lock",MODE_PRIVATE);
         tokenExisted = read.getString("token", "");
+        Userid = read.getString("id", "");
         firstLogin = read.getString("firstLogin", "");
         if(firstLogin.equals("")){
             firstLogin="true";
@@ -103,13 +106,10 @@ public class DetailedUserInformation extends AppCompatActivity {
 
 
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("https://app.nfls.io/API/User/User.php?action=GetPersonalGeneralInfoByToken");
+            HttpGet httpget = new HttpGet("https://forum.mrtunnel.club/api/users/"+Userid);
 
             try {
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("token",tokenExisted));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                HttpResponse response = httpclient.execute(httppost);
+                HttpResponse response = httpclient.execute(httpget);
                 json = EntityUtils.toString(response.getEntity());
             } catch (ClientProtocolException e) {
                 System.out.println("Protool Error");
@@ -125,7 +125,7 @@ public class DetailedUserInformation extends AppCompatActivity {
             } catch (JSONException ex) {
                 System.out.println("Server Error");
             }
-
+/*
             try {
                 status=jsonObject
                         .getString("status");
@@ -140,22 +140,21 @@ public class DetailedUserInformation extends AppCompatActivity {
 
                 try {
                     System.out.println("dealing with json");
-
-                    username = jsonObject
-                            .getString("username");
-
+                    String UserInfoStr=jsonObject.getString("data");
+                    JSONObject UserInfo = new JSONObject(UserInfoStr);
+                    id = UserInfo.getString("id");
+                    String name_attributes = UserInfo.getString("attributes");
+                    JSONObject username_json = new JSONObject(name_attributes);
+                    username = username_json.getString("username");
+                    avatar_path = username_json.getString("avatarUrl");
                     System.out.println(username);
-                     id = jsonObject
-                        .getString("id");
                     System.out.println(id);
-                    email = jsonObject
+                    email = username_json
                             .getString("email");
                     System.out.println(email);
-                    join_time = jsonObject
+                    join_time = username_json
                             .getString("join_time");
                     System.out.println(join_time);
-                    avatar_path = jsonObject
-                            .getString("avatar_path");
                     System.out.println(avatar_path);
                     //System.out.println("FUCKING JSON");
                     info_full="Username:"+username +"\n"
@@ -198,6 +197,60 @@ public class DetailedUserInformation extends AppCompatActivity {
                 });
             }
 
+*/
+            try {
+                System.out.println("dealing with json");
+                String UserInfoStr=jsonObject.getString("data");
+                JSONObject UserInfo = new JSONObject(UserInfoStr);
+                id = UserInfo.getString("id");
+                String name_attributes = UserInfo.getString("attributes");
+                JSONObject username_json = new JSONObject(name_attributes);
+                username = username_json.getString("username");
+                avatar_path = username_json.getString("avatarUrl");
+                System.out.println(username);
+                System.out.println(id);
+               // email = username_json
+                      //  .getString("email");
+                //System.out.println(email);
+                join_time = username_json
+                        .getString("joinTime");
+                System.out.println(join_time);
+                System.out.println(avatar_path);
+                //System.out.println("FUCKING JSON");
+                info_full="Username:"+username +"\n"
+                        +"id:"+id+"\n"
+                        +"email:"+email+"\n"
+                        +"join time:"+join_time+"\n";
+
+            } catch (JSONException ex) {
+                //Toast.makeText(UserLogin.this, "Server Error", Toast.LENGTH_SHORT).show();
+                System.out.println("JSON fucked");
+
+            }
+            //Toast.makeText(UserLogin.this, token + id, Toast.LENGTH_LONG).show();
+            //System.out.println(token+"--"+id);
+            imageUrl="https://forum.nfls.io/assets/avatars/"+avatar_path;
+            if (avatar_path.equals(null)){
+                imageUrl="https://forum.nfls.io/assets/avatars/"+"forum.png";
+
+            }
+
+            try {
+                myFileUrl = new URL(imageUrl);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            try {
+                HttpURLConnection conn = (HttpURLConnection) myFileUrl
+                        .openConnection();
+                conn.setDoInput(true);
+                conn.connect();
+                InputStream is = conn.getInputStream();
+                bitmap = BitmapFactory.decodeStream(is);
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             runOnUiThread(new Runnable() {
                     public void run() {

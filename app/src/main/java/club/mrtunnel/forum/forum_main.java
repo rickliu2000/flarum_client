@@ -1,4 +1,4 @@
-package io.nfls.forum;
+package club.mrtunnel.forum;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,7 +16,6 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -327,7 +326,7 @@ public class forum_main extends AppCompatActivity
                             System.out.println(wifi+" "+internet);
                             if(wifi|internet){
                                 TextView status = (TextView) findViewById(R.id.title);
-                                status.setText("Welcome to NFLS Community!");
+                                status.setText("Welcome to Community!");
                                 if (!ping()) {
 
                                     Toast.makeText(getApplicationContext(), "Our server lost his girlfriend 😭He is now hanging around",
@@ -443,7 +442,12 @@ public class forum_main extends AppCompatActivity
 
                     imageUrl = UserAvatarPathOrdered[i];
                 } else {
-                    imageUrl = "https://forum.nfls.io/assets/avatars/" + avatar_path;
+                    imageUrl = "https://forum.mrtunnel.club/assets/avatars/" + avatar_path;
+                    if (avatar_path.equals(null)){
+                        imageUrl="https://forum.nfls.io/assets/avatars/"+"forum.png";
+                        avatar_path="forum.png";
+
+                    }
                 }
                 if((isUser)||(!isUser&&avatar_path!=null)) {
                     try {
@@ -532,7 +536,7 @@ public class forum_main extends AppCompatActivity
                             status.setText("Hangin’ around, Nothing to do but frown.");
                         }
                         TextView status = (TextView) findViewById(R.id.title);
-                        status.setText("Welcome to NFLS Community!");
+                        status.setText("Welcome to Community!");
                     }else{
                         System.out.println("No internet");
                         Toast.makeText(getApplicationContext(), "Where do you think you are？On Mars？ Where's your connection",
@@ -547,8 +551,8 @@ public class forum_main extends AppCompatActivity
 
 
             HttpClient httpclient = new DefaultHttpClient();
-            System.out.println("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser&page%5Boffset%5D="+pageCount*20);
-            HttpGet httppost = new HttpGet("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser&page%5Boffset%5D="+pageCount*20);
+            System.out.println("https://forum.mrtunnel.club/api/discussions?include=startUser%2ClastUser&page%5Boffset%5D="+pageCount*20);
+            HttpGet httppost = new HttpGet("https://forum.mrtunnel.club/api/discussions?include=startUser%2ClastUser&page%5Boffset%5D="+pageCount*20);
 
             try {
                 HttpResponse response = httpclient.execute(httppost);
@@ -635,7 +639,7 @@ public class forum_main extends AppCompatActivity
                         //list.add(title+" author:"+startUserName+" Last reply:"+lastUserName+" post time:"+startTime+" reply:"+commentsCount);
                         if (UserAvatarPathOrdered[i] == "null") {
                             System.out.println(i + " lacks avatar");
-                            UserAvatarPathOrdered[i] = "https://forum.nfls.io/assets/avatars/nfls_forum.png";
+                            UserAvatarPathOrdered[i] = "https://forum.mrtunnel.club/assets/avatars/forum.png";
                         }
                         System.out.println(UserAvatarPathOrdered[i]);
 

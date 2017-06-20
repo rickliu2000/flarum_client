@@ -1,8 +1,7 @@
-package io.nfls.forum;
+package club.mrtunnel.forum;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
 import android.support.v7.app.AppCompatActivity;
 
 /**

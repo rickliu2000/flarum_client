@@ -1,32 +1,26 @@
-package io.nfls.forum;
+package club.mrtunnel.forum;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import static android.R.attr.value;
 
 
 /**
@@ -51,7 +45,7 @@ public class DiscussionDetail extends Activity {
         System.out.println(cookie);
         Intent intent = getIntent();
         value = intent.getStringExtra("DISCUSSION_ID");
-        CookieManager.getInstance().setCookie("nfls.io", cookie);
+        CookieManager.getInstance().setCookie("forum.mrtunnel.club", cookie);
         final ConnectivityManager con=(ConnectivityManager)getSystemService(Activity.CONNECTIVITY_SERVICE);
         boolean wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
         boolean internet=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
@@ -113,7 +107,7 @@ public class DiscussionDetail extends Activity {
                 //System.out.println("666");
                 System.out.println(url);
 
-                if (url.equals("https://forum.nfls.io/api/discussions?include=startUser%2ClastUser%2CstartPost%2Ctags&&")) {
+                if (url.equals("https://forum.mrtunnel.club/api/discussions?include=startUser%2ClastUser%2CstartPost%2Ctags&&")) {
                     onBackPressed();
 
                     return ;
@@ -125,7 +119,7 @@ public class DiscussionDetail extends Activity {
 
 
         });
-        discussionDetailView.loadUrl("https://forum.nfls.io/d/"+value);
+        discussionDetailView.loadUrl("https://forum.mrtunnel.club/d/"+value);
 
 
 
