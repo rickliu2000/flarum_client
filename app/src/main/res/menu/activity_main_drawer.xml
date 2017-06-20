@@ -20,7 +20,7 @@
             android:title="Tools" />
     </group>
 -->
-    <item android:title="Proudly inspired by the OSC">
+    <item android:title="Created by Mr Tunnel's Club">
         <menu>
             <item
                 android:id="@+id/nav_settings"

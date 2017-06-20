@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        android:text="上什么课做什么事"
+        android:text="Mr Tunnel"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="14sp" />
 
@@ -37,6 +37,6 @@
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:text="tianzundibei@163.com" />
+        android:text="Mr_Tunnel@mrtunnel.club" />
 
 </LinearLayout>

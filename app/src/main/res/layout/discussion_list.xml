@@ -28,7 +28,7 @@
             android:id="@+id/info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#967265"
+            android:textColor="#4D698E"
             android:textSize="12sp" />
     </LinearLayout>
 

@@ -120,8 +120,8 @@ public class UserLogin extends AppCompatActivity {
 
             try {
                 // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("username", username));
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+                nameValuePairs.add(new BasicNameValuePair("identification", username));
                 nameValuePairs.add(new BasicNameValuePair("password", password));
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
@@ -156,7 +156,7 @@ public class UserLogin extends AppCompatActivity {
             }
 
 
-            try {
+           /* try {
                 status=jsonObject
                         .getString("status");
             }catch (JSONException ex) {
@@ -196,12 +196,28 @@ public class UserLogin extends AppCompatActivity {
                 }
             }
 
+*/
+
+            try {
+                System.out.println("dealing with json");
+
+                token = jsonObject
+                        .getString("token");
+                UserId = jsonObject
+                        .getString("userId");
+                success=true;
+            } catch (JSONException ex) {
+
+                System.out.println("JSON fucked");
+
+            }
 
             runOnUiThread(new Runnable() {
                 public void run() {
                    if(success){
                        SharedPreferences.Editor editor = getSharedPreferences("lock", MODE_PRIVATE).edit();
                        editor.putString("token", token);
+                       System.out.println(cookie);
                        editor.putString("cookie", cookie);
                        editor.putString("id", UserId);
                        editor.commit();
