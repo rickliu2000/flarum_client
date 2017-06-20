@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.nfls.forum">
+    package="club.mrtunnel.forum">
 
     <application
         android:allowBackup="true"
@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="io.nfls.forum.forum_main"
+        <activity android:name="club.mrtunnel.forum.forum_main"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -16,11 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="io.nfls.forum.DetailedUserInformation" ></activity>
-        <activity android:name="io.nfls.forum.UserLogin" ></activity>
-        <activity android:name="io.nfls.forum.DiscussionDetail" ></activity>
-        <activity android:name="io.nfls.forum.NewDiscussion" ></activity>
-        <activity android:name="io.nfls.forum.About" ></activity>
+        <activity android:name="club.mrtunnel.forum.DetailedUserInformation" ></activity>
+        <activity android:name="club.mrtunnel.forum.UserLogin" ></activity>
+        <activity android:name="club.mrtunnel.forum.DiscussionDetail" ></activity>
+        <activity android:name="club.mrtunnel.forum.NewDiscussion" ></activity>
+        <activity android:name="club.mrtunnel.forum.About" ></activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
