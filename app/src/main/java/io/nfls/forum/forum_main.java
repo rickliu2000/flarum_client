@@ -170,6 +170,7 @@ public class forum_main extends AppCompatActivity
 
 
 
+        //Get avatar ************************need change**************
 
         if(isLogedin.equals("true")){
            username=read.getString("Username", "");
@@ -268,6 +269,8 @@ public class forum_main extends AppCompatActivity
         }
     }
 
+    //Put thread title user avatar into the list
+
     public void setlist(){
         isUser=true;
         for(int i=0; i<20;i++){
@@ -301,6 +304,7 @@ public class forum_main extends AppCompatActivity
 
         }
 
+        //Pull to load ***************Internet chk need to be changed not working
 
         final ArrayAdapter adapter = new ArrayAdapter(this,R.layout.discussion_list,list);
         final ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar);
@@ -369,7 +373,7 @@ public class forum_main extends AppCompatActivity
 
             }
         });
-
+        // Click on thread
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -388,7 +392,7 @@ public class forum_main extends AppCompatActivity
         });
 
     }
-
+// Put avatar into list
     private void showAvatar(){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -397,7 +401,7 @@ public class forum_main extends AppCompatActivity
         imView.setImageBitmap(bitmap);
     }
 
-
+// Not working need change
     public static boolean ping() {
         String result = null;
         try {
@@ -428,7 +432,7 @@ public class forum_main extends AppCompatActivity
         return false;
     }
 
-
+// Get avatar
     private class GetDetail extends AsyncTask<Integer, String, Integer> {
         @Override
         protected Integer doInBackground(Integer... params) {
@@ -508,7 +512,7 @@ public class forum_main extends AppCompatActivity
         }
     }
 
-
+//Get discussion
     private class GetDiscussion extends AsyncTask<Integer, String, Integer> {
 
         @Override

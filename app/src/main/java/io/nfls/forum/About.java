@@ -25,7 +25,7 @@ public class About extends AppCompatActivity {
         public void onCreate(final Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.layout.activity_about);
+            addPreferencesFromResource(R.xml.activity_about);
 
         }
     }
